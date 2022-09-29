@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+export DH_OPTIONS
+export DH_GOPKG := github.com/BurntSushi/toml
+
+%:
+	dh $@ --builddirectory=_build --buildsystem=golang --with=golang
+
+override_dh_auto_build:
+	# Fix build
+	# _build/src/github.com/BurntSushi/toml/internal/\
+	# toml-test/runner.go:29:12: pattern tests/*: \
+	# no matching files found
+	cp -rf $(CURDIR)/internal/toml-test/tests \
+		$(CURDIR)/_build/src/$(DH_GOPKG)/internal/toml-test/.
+	dh_auto_build
+
+override_dh_auto_install:
+	dh_auto_install
+	# Don't install test binaries
+	cd $(CURDIR)/debian/golang-github-burntsushi-toml-dev/ && \
+		rm -rf usr/bin && \
+		rm -rf usr/share/gocode/src/$(DH_GOPKG)/internal/toml-test/tests
