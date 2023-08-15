@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: toml
 Source: https://github.com/BurntSushi/toml
+Upstream-Name: toml
 
 Files: *
 Copyright: 2013 TOML authors

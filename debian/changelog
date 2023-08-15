@@ -1,3 +1,55 @@
+golang-toml (1.2.1-1) unstable; urgency=medium
+
+  * New upstream version 1.2.1
+  * Remove 0001-Fix-32bit-test.patch which has been applied upstream
+  * Reorder fields in debian/control and debian/copyright
+  * Use dh-sequence-golang instead of dh-golang and --with=golang
+  * Bump Standards-Version to 4.6.2 (no change)
+  * debian/gbp.conf: Set debian-branch to debian/sid for DEP-14 conformance
+  * Add Lintian overrides for golang-github-burntsushi-toml-dev
+
+ -- Anthony Fok <foka@debian.org>  Tue, 20 Jun 2023 00:20:13 -0600
+
+golang-toml (1.2.0-2) unstable; urgency=medium
+
+  * Team upload.
+  * Fix tests on 32bit arch
+
+ -- Shengjing Zhu <zhsj@debian.org>  Sun, 21 Aug 2022 13:51:00 +0800
+
+golang-toml (1.2.0-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream version 1.2.0
+  * Update Standards-Version to 4.6.1 (no changes)
+
+ -- Shengjing Zhu <zhsj@debian.org>  Sat, 20 Aug 2022 15:52:08 +0800
+
+golang-toml (1.1.0-1) unstable; urgency=medium
+
+  * Team upload.
+  * Refresh patches for version 1.1.0
+  * New upstream version 1.1.0
+
+ -- Punit Agrawal <punit@debian.org>  Sun, 26 Jun 2022 08:47:30 +0100
+
+golang-toml (1.0.0-2) unstable; urgency=medium
+
+  * Team upload.
+  * Fix tests on 32 bit archs
+
+ -- Shengjing Zhu <zhsj@debian.org>  Tue, 22 Feb 2022 23:33:15 +0800
+
+golang-toml (1.0.0-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream version 1.0.0
+  * Use git mode in uscan watch file
+  * Update Standards-Version to 4.6.0 (no changes)
+  * Simplify d/rules
+
+ -- Shengjing Zhu <zhsj@debian.org>  Mon, 21 Feb 2022 23:46:25 +0800
+
 golang-toml (0.4.1+git20210923.e0af6a2-1) unstable; urgency=medium
 
   * Team upload.
