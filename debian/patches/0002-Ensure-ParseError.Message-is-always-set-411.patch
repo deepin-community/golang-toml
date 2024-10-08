@@ -1,0 +1,124 @@
+From: Martin Tournoij <martin@arp242.net>
+Date: Sun, 26 May 2024 21:15:16 +0200
+Subject: Ensure ParseError.Message is always set (#411)
+
+ParseError.Error() did:
+
+	msg := pe.Message
+	if msg == "" {
+		msg = pe.err.Error()
+	}
+
+That was fine, but not very useful for people wanting to access the
+Message field themselves, especially since err isn't exported.
+
+For example staticcheck does this to add in the filename, and the error
+is lost, because Message is often blank:
+
+	% staticcheck
+	staticcheck.conf:5:0:  (last key parsed: "dot_import_whitelist") (compile)
+
+We now only use the err field to determine which error usage to display
+in ErrorWithUsage()
+---
+ decode.go |  3 ++-
+ error.go  | 25 +++++++------------------
+ parse.go  |  4 +++-
+ 3 files changed, 12 insertions(+), 20 deletions(-)
+
+diff --git a/decode.go b/decode.go
+index ff9609c..c05a0b7 100644
+--- a/decode.go
++++ b/decode.go
+@@ -542,10 +542,11 @@ func (md *MetaData) parseErr(err error) error {
+ 	k := md.context.String()
+ 	d := string(md.data)
+ 	return ParseError{
++		Message:  err.Error(),
++		err:      err,
+ 		LastKey:  k,
+ 		Position: md.keyInfo[k].pos.withCol(d),
+ 		Line:     md.keyInfo[k].pos.Line,
+-		err:      err,
+ 		input:    d,
+ 	}
+ }
+diff --git a/error.go b/error.go
+index 93a870c..1dd5232 100644
+--- a/error.go
++++ b/error.go
+@@ -92,16 +92,11 @@ func (p Position) withCol(tomlFile string) Position {
+ }
+ 
+ func (pe ParseError) Error() string {
+-	msg := pe.Message
+-	if msg == "" { // Error from errorf()
+-		msg = pe.err.Error()
+-	}
+-
+ 	if pe.LastKey == "" {
+-		return fmt.Sprintf("toml: line %d: %s", pe.Position.Line, msg)
++		return fmt.Sprintf("toml: line %d: %s", pe.Position.Line, pe.Message)
+ 	}
+ 	return fmt.Sprintf("toml: line %d (last key %q): %s",
+-		pe.Position.Line, pe.LastKey, msg)
++		pe.Position.Line, pe.LastKey, pe.Message)
+ }
+ 
+ // ErrorWithPosition returns the error with detailed location context.
+@@ -112,25 +107,19 @@ func (pe ParseError) ErrorWithPosition() string {
+ 		return pe.Error()
+ 	}
+ 
++	// TODO: don't show control characters as literals? This may not show up
++	// well everywhere.
++
+ 	var (
+ 		lines = strings.Split(pe.input, "\n")
+ 		b     = new(strings.Builder)
+ 	)
+-
+-	msg := pe.Message
+-	if msg == "" {
+-		msg = pe.err.Error()
+-	}
+-
+-	// TODO: don't show control characters as literals? This may not show up
+-	// well everywhere.
+-
+ 	if pe.Position.Len == 1 {
+ 		fmt.Fprintf(b, "toml: error: %s\n\nAt line %d, column %d:\n\n",
+-			msg, pe.Position.Line, pe.Position.Col)
++			pe.Message, pe.Position.Line, pe.Position.Col)
+ 	} else {
+ 		fmt.Fprintf(b, "toml: error: %s\n\nAt line %d, column %d-%d:\n\n",
+-			msg, pe.Position.Line, pe.Position.Col, pe.Position.Col+pe.Position.Len-1)
++			pe.Message, pe.Position.Line, pe.Position.Col, pe.Position.Col+pe.Position.Len-1)
+ 	}
+ 	if pe.Position.Line > 2 {
+ 		fmt.Fprintf(b, "% 7d | %s\n", pe.Position.Line-2, expandTab(lines[pe.Position.Line-3]))
+diff --git a/parse.go b/parse.go
+index 33fb0a8..3f2c090 100644
+--- a/parse.go
++++ b/parse.go
+@@ -92,6 +92,7 @@ func parse(data string) (p *parser, err error) {
+ 
+ func (p *parser) panicErr(it item, err error) {
+ 	panic(ParseError{
++		Message:  err.Error(),
+ 		err:      err,
+ 		Position: it.pos.withCol(p.lx.input),
+ 		Line:     it.pos.Len,
+@@ -123,10 +124,11 @@ func (p *parser) next() item {
+ 	if it.typ == itemError {
+ 		if it.err != nil {
+ 			panic(ParseError{
++				Message:  it.err.Error(),
++				err:      it.err,
+ 				Position: it.pos.withCol(p.lx.input),
+ 				Line:     it.pos.Line,
+ 				LastKey:  p.current(),
+-				err:      it.err,
+ 			})
+ 		}
+ 
