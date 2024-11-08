@@ -1,3 +1,25 @@
+golang-toml (1.4.0-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+  * Backport Position.Col (needed by golang-honnef-go-tools 2024.1rc1)
+
+ -- Shengjing Zhu <zhsj@debian.org>  Wed, 14 Aug 2024 01:07:47 +0800
+
+golang-toml (1.3.2-2) unstable; urgency=medium
+
+  * Upload to unstable
+  * Add more Linitan overrides for "national-encoding" warnings
+
+ -- Anthony Fok <foka@debian.org>  Sun, 03 Dec 2023 07:59:40 -0700
+
+golang-toml (1.3.2-1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream release
+
+ -- Reinhard Tartler <siretart@tauware.de>  Thu, 23 Nov 2023 16:31:00 +0000
+
 golang-toml (1.2.1-1) unstable; urgency=medium
 
   * New upstream version 1.2.1
